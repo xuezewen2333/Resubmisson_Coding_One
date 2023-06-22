@@ -6,7 +6,7 @@ Zewen Xue
 
 Mimic link: https://mimicproject.com/code/0d0f3fb9-1c02-a33b-4925-76de4390087d
 
-Vedio link: https://youtu.be/lh4CmgfZ4zo
+Video link: https://youtu.be/lh4CmgfZ4zo
 
 #Project Description：
 
