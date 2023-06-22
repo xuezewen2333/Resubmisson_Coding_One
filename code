@@ -1,0 +1,277 @@
+<head>
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/109/three.min.js">  </script>
+<script src = "https://mimicproject.com/libs/nexusUI.js"></script>
+<script src = "https://mimicproject.com/libs/maximilian.v.0.1.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet"/>  
+<link rel="stylesheet" href="https://mimicproject.com/libs/maximilian-example.css" /> 
+<script src = "https://mimicproject.com/libs/maximilian.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet">  
+<script src = "https://rawgit.com/nexus-js/ui/master/dist/NexusUI.js"></script>
+<link rel="stylesheet" href="styleCSS" />
+<link rel="stylesheet" type="text/main.css" href="main.css" /> 
+<div>
+ <div id="title">Jazz Universe . ZEWEN XUE</div>
+ <div id="subtitle">Jumping spots of light rhythmically move with the music and move the mouse to see that this colorful world is made of sharp geometry. </div> 
+</div>
+<div id="oscilloscope"></div>
+<div id="spectrogram"></div>
+<div id="ripple"></div>
+  
+  <meta charset="utf-8">
+	<style>
+		body {
+			margin: 0px;
+			background-color: #FFFFFF;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+<script language="javascript" type="text/javascript">
+  //The inspiration of this project is from my week8-2 assignment--rainbow dreamland.Since week8-2 was previously the assignment I planned to submit as a final project, I continued to optimize it.
+  //model
+  var rippleGroup;
+  var rippleGeometry, rippleMaterial;
+  var rippleRadius = 20;
+  var rippleSegments = 50;
+  var rippleMeshes = [];
+
+  var raycaster = new THREE.Raycaster();
+  var mouse = new THREE.Vector2();
+
+  var camera, scene, renderer, stats;
+  var geometry, group;
+  var distanceNum;
+  var mouseX = 0;
+  var mouseY = 0;
+  
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+      
+  var HALF_WIDTH = width/10 ;
+  var HALF_HEIGHT = height / 2;  
+  
+  init();
+  animate();
+  
+  
+  function init(){
+	camera = new THREE.PerspectiveCamera(40,width/height,1,10000);
+    camera.position.z = 500;
+    
+    //create a scene and add things to it.   
+    scene = new THREE.Scene();
+    
+    // Creating ripple spots
+    rippleGeometry = new THREE.CircleBufferGeometry(rippleRadius, rippleSegments);
+    rippleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.5 });
+
+    // Define the range and spacing of the spot distribution
+    var numColumns = 150;  // Number of spot columns
+    var numRows = 150;     // Number of rows of light spots
+    var spacingX = 50;    // Spacing of light spots on the x-axis
+    var spacingY = 50;    // Spacing of light spots on the y-axis
+    var spacingZ = 50;    // Spacing of light spots on the z-axis
+
+    rippleGroup = new THREE.Group();
+
+    for (var i = 0; i < numRows; i++) {
+      for (var j = 0; j < numColumns; j++) {
+        var rippleMesh = new THREE.Mesh(rippleGeometry, rippleMaterial.clone());
+    
+        // Calculating the position of the light spot
+        var posX = (j - numColumns / 2) * spacingX;
+        var posY = (i - numRows / 2) * spacingY;
+        var posZ = Math.random() * spacingZ;  // Random offsets can be added to the z-axis
+    
+        rippleMesh.position.set(posX, posY, posZ);
+        rippleMesh.startTime = Date.now() * 0.001;
+     
+        rippleGroup.add(rippleMesh);
+        rippleMeshes.push(rippleMesh);
+      }
+    }
+
+    scene.add(rippleGroup);
+    
+    //Create group to add a bunch of geometry together
+    group = new THREE.Group();
+    
+	  // var BoxGeometry = new THREE.BoxBufferGeometry(100, 100, 100);
+    // parame for Torous: Radius of the torus, Radius of the tube ,radialSegments, tubularSegments
+    var TorusSize = 10;
+    var TorusGeometry = new THREE.TorusBufferGeometry( TorusSize, TorusSize/200, TorusSize, TorusSize*10 );
+    var TorusMaterial = new THREE.MeshNormalMaterial();
+ 
+    //These geometries can now be rotated / scaled etc as a group
+    var TorusGroup = new THREE.Group();
+
+    // param for Torous:radius, height, radialSegments
+    var ConeSize = 120;
+    var ConeGeometry = new THREE.ConeGeometry( ConeSize, ConeSize*50, ConeSize*2);
+    var ConeMaterial = new THREE.MeshNormalMaterial();
+ 
+    //These geometries can now be rotated / scaled etc as a group
+    var ConeGroup = new THREE.Group();
+	
+    for(i=0; i<50; i++){
+	  var ConeMesh = new THREE.Mesh(ConeGeometry, ConeMaterial);
+    distanceNum = 3000;
+    //use distanceNum/2 to centre the group of geometry
+    ConeMesh.position.x = Math.random()*distanceNum - distanceNum/2;
+    ConeMesh.position.y = Math.random()*distanceNum - distanceNum/2;
+    ConeMesh.position.z = Math.random()*distanceNum - distanceNum/2;
+      
+    ConeMesh.rotation.x = Math.random()*2*Math.PI;  
+    ConeMesh.rotation.y = Math.random()*2*Math.PI;
+      
+    ConeMesh.matrixAutoUpdate = false;
+    ConeMesh.updateMatrix();  
+      
+    group.add(ConeMesh);  
+    }
+  
+    // parame for Cylinder: radiusTop, radiusBottom, height, radialSegments
+    var CylinderSize = 25;
+    var CylinderGeometry = new THREE.CylinderGeometry(CylinderSize, CylinderSize, CylinderSize*5,CylinderSize*2);
+    var CylinderMaterial = new THREE.MeshNormalMaterial();
+ 
+    //These geometries can now be rotated / scaled etc as a group
+    var CylinderGroup = new THREE.Group();
+	
+    for(i=0; i<100; i++){
+	  var CylinderMesh = new THREE.Mesh(CylinderGeometry, CylinderMaterial);
+    distanceNum = 3000;
+    //use distanceNum/2 to centre the group of geometry
+    CylinderMesh.position.x = Math.random()*distanceNum - distanceNum/2;
+    CylinderMesh.position.y = Math.random()*distanceNum - distanceNum/2;
+    CylinderMesh.position.z = Math.random()*distanceNum - distanceNum/2;
+      
+    CylinderMesh.rotation.x = Math.random()*2*Math.PI;  
+    CylinderMesh.rotation.y = Math.random()*2*Math.PI;
+      
+    CylinderMesh.matrixAutoUpdate = false;
+    CylinderMesh.updateMatrix();  
+      
+    group.add(CylinderMesh);  
+    }
+ 
+let tubeNum =25; //adjust the size
+  
+class CustomSinCurve extends THREE.Curve {
+	constructor( scale = 1 ) {
+		super();
+		this.scale = scale;
+	}
+	getPoint( t, optionalTarget = new THREE.Vector3() ) {
+		const tx = t * tubeNum - tubeNum/3;
+		const ty = Math.sin( 4* Math.PI * t )*tubeNum/5;
+		const tz = 0;
+		return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );}}
+
+    const TubePath = new CustomSinCurve( 10 );
+    //TubeGeometry(path, tubularSegments, radius, radialSegments, closed)
+    let TubeGeometry = new THREE.TubeGeometry( TubePath, 50, tubeNum/1.6, 40, false );
+    let TubeMaterial = new THREE.MeshNormalMaterial();
+
+    //These geometries can now be rotated / scaled etc as a group
+    var TubeGroup = new THREE.Group();
+    
+    scene.add(group);
+    
+    renderer = new THREE.WebGLRenderer();
+    // This is to make sure that the scene understands the resolution of the device we are on.
+	  renderer.setPixelRatio(window.devicePixelRatio);
+    // We can also set the size of the render window
+	  renderer.setSize(window.innerWidth, window.innerHeight);
+    // Finally we want to connect the renderer to the HTML document
+  	document.body.appendChild(renderer.domElement);
+    // And make sure that when the page is resized, everything gets updated 
+	  window.addEventListener('resize', onWindowResize, false);  
+    window.addEventListener('mousemove',getMouse,false);
+ }
+  
+ function onWindowResize() {
+
+  // Update the position and size of the ripple spot
+  for (var i = 0; i < rippleMeshes.length; i++) {
+    var rippleMesh = rippleMeshes[i];
+    rippleMesh.position.x = mouseX;
+    rippleMesh.position.y = mouseY;
+  }
+
+    // Update the size of the camera and renderer
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+}    
+  
+function getMouse (mousePosition) {
+  mouseX = (event.clientX - HALF_WIDTH) * 5;
+  mouseY = (event.clientY - HALF_HEIGHT) * 5; 
+}
+  
+function animate() {
+  requestAnimationFrame(animate);
+  render();
+}
+  
+function render(){
+  var time = Date.now() * 0.0001;
+  var rx = Math.sin(time * 0.7) * 0.5,
+      ry = Math.sin(time * 0.3) * 0.5,
+      rz = Math.sin(time * 0.2) * 0.5;
+  
+  camera.position.x += (mouseX - camera.position.x) * 0.05;
+  camera.position.y += (-mouseY - camera.position.y) * 0.05;
+  camera.lookAt(scene.position); 
+    
+  group.rotation.x = rx;
+  group.rotation.y = ry;
+  group.rotation.z = rz;
+  // Update the position and size of the ripple spot
+  for (var i = 0; i < rippleMeshes.length; i++) {
+    var rippleMesh = rippleMeshes[i];
+    var scale = Math.abs(Math.sin((Date.now() * 0.001 - rippleMesh.startTime) * Math.PI));
+    rippleMesh.scale.set(scale, scale, 1);
+  }
+
+    renderer.render(scene, camera);  
+    
+}
+  
+</script>
+ 
+//music
+<script>
+let mp3 = new Audio('drum.wav') 
+mp3.volume = Math.random(1)/3
+mp3.loop = true
+mp3.play() 
+</script>
+
+<script id="2d-fragment-shader" type="x-shader/x-fragment">
+  </script>
+<script id="2d-vertex-shader" type="x-shader/x-vertex">
+  </script>
+<canvas id="glscreen">
+  </canvas>
+<head>
+</head>
+<body>
+ <body onmousedown="handleMouseDown(event)">
+
+ <script>
+   // <script scr="main.js">
+   // set up global javascript variables
+
+var canvas, gl; // canvas and webgl context
+
+var shaderScript;
+var shaderSource;
+var vertexShader; // Vertex shader.  Not much happens in that shader, it just creates the vertex's to be drawn o
+</script>  
+</body>
+</html>
