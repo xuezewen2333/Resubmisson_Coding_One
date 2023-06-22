@@ -6,6 +6,8 @@ Zewen Xue
 
 Mimic link: https://mimicproject.com/code/0d0f3fb9-1c02-a33b-4925-76de4390087d
 
+Vedio link: https://youtu.be/lh4CmgfZ4zo
+
 #Project Description：
 
 Jazz Universe is an immersive piece that allows the viewer to adjust the perspective through the interaction of the mouse with the interface. Once activated, the glorious electronic patches of light move in rhythm with pleasant jazz music, creating an enchanting and immersive atmosphere. At first glance, this piece exudes unparalleled beauty.
